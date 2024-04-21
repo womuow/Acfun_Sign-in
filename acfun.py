@@ -1,8 +1,26 @@
 import requests
 import json
 import sys
+import smtplib
+from email.mime.text import MIMEText
+from email.utils import formataddr
 
-def acfun_login():
+
+def send_mail(theme, message, Tomail):
+    "以QQ邮箱发送消息"
+    msg = MIMEText(message, "html", "utf-8")
+    msg["From"] = formataddr(["cuimu", "cuimu1996@qq.com"])
+    msg["to"] = Tomail
+    msg["Subject"] = theme
+
+    server = smtplib.SMTP_SSL("smtp.qq.com")
+    server.login("cuimu1996@qq.com", "hhwuzuspsrfcbfha")
+    server.sendmail("cuimu1996@qq.com", Tomail, msg.as_string())
+    server.quit()
+    print("Mail has Send!!")
+
+
+def acfun_login(username, password):
     url = 'https://id.app.acfun.cn/rest/web/login/signin'
 
     headers = {
@@ -62,9 +80,11 @@ def sendMessage(String):
 
 
 if __name__ == '__main__':
-    username = sys.argv[1]
-    password = sys.argv[2]
+    username = "15324840023"  # sys.argv[1]
+    password = "1996928cuimu"  # sys.argv[2]
 
-    cookies = acfun_login()
+    cookies = acfun_login(username, password)
     response_signin = acfun_signin(cookies)
-    sendMessage(response_signin.text)
+    mes = json.loads(response_signin.text)["msg"]
+    send_mail("ACFun签到", f"签到成功{mes}", "womuow@139.com")
+    # sendMessage(response_signin.text)
